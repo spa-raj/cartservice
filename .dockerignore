@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+*.iml
+.vscode
+
+# Build artifacts (except what we need)
+target/
+!target/*.jar
+
+# Maven wrapper jar (will be downloaded)
+.mvn/wrapper/maven-wrapper.jar
+
+# Documentation
+*.md
+README*
+
+# CI/CD
+.github
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.*.local
+
+# Tests (not needed in production image)
+src/test/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files (don't include in build context recursively)
+docker-compose*.yml
+Dockerfile*
