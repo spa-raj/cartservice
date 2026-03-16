@@ -86,7 +86,7 @@ public class CartServiceImpl implements CartService {
 
         item.setQuantity(quantity);
         Cart saved = cartRepository.save(cart);
-        cartEventProducer.sendItemAdded(userId, productId, quantity);
+        cartEventProducer.sendItemUpdated(userId, productId, quantity);
         return saved;
     }
 
