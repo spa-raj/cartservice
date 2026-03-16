@@ -23,6 +23,7 @@ public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final ProductValidationService productValidationService;
+    private final CartEventProducer cartEventProducer;
 
     @Override
     public Cart getCart(String userId) {
@@ -60,7 +61,9 @@ public class CartServiceImpl implements CartService {
             cart.getItems().add(newItem);
         }
 
-        return cartRepository.save(cart);
+        Cart saved = cartRepository.save(cart);
+        cartEventProducer.sendItemAdded(userId, resolvedProductId, quantity);
+        return saved;
     }
 
     @Override
@@ -82,7 +85,9 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new CartItemNotFoundException("Product " + productId + " not found in cart"));
 
         item.setQuantity(quantity);
-        return cartRepository.save(cart);
+        Cart saved = cartRepository.save(cart);
+        cartEventProducer.sendItemAdded(userId, productId, quantity);
+        return saved;
     }
 
     @Override
@@ -95,7 +100,9 @@ public class CartServiceImpl implements CartService {
             throw new CartItemNotFoundException("Product " + productId + " not found in cart");
         }
 
-        return cartRepository.save(cart);
+        Cart saved = cartRepository.save(cart);
+        cartEventProducer.sendItemRemoved(userId, productId);
+        return saved;
     }
 
     @Override
@@ -104,7 +111,9 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new CartNotFoundException("Cart not found for user: " + userId));
 
         cart.getItems().clear();
-        return cartRepository.save(cart);
+        Cart saved = cartRepository.save(cart);
+        cartEventProducer.sendCartCleared(userId);
+        return saved;
     }
 
     @Override
@@ -116,6 +125,7 @@ public class CartServiceImpl implements CartService {
             throw new EmptyCartException("Cart is empty, cannot checkout");
         }
 
+        cartEventProducer.sendCheckoutInitiated(userId, cart.getItems());
         log.info("Checkout initiated for user: {} with {} items", userId, cart.getTotalItems());
         return cart;
     }
