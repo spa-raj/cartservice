@@ -32,6 +32,17 @@ public class CartEventProducer {
                 .build());
     }
 
+    public void sendItemUpdated(String userId, String productId, int quantity) {
+        send(CartEvent.builder()
+                .eventId(UUID.randomUUID().toString())
+                .eventType(CartEventType.ITEM_UPDATED)
+                .userId(userId)
+                .productId(productId)
+                .quantity(quantity)
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+
     public void sendItemRemoved(String userId, String productId) {
         send(CartEvent.builder()
                 .eventId(UUID.randomUUID().toString())
