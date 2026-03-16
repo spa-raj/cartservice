@@ -5,7 +5,9 @@ import com.vibevault.cartservice.dtos.cart.CartResponseDto;
 import com.vibevault.cartservice.dtos.cart.UpdateQuantityRequestDto;
 import com.vibevault.cartservice.models.Cart;
 import com.vibevault.cartservice.services.CartService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +26,9 @@ public class CartController {
     }
 
     @PostMapping("/items")
+    @ResponseStatus(HttpStatus.CREATED)
     public CartResponseDto addItem(@AuthenticationPrincipal Jwt jwt,
-                                   @RequestBody AddToCartRequestDto request) {
+                                   @Valid @RequestBody AddToCartRequestDto request) {
         Cart cart = cartService.addItem(jwt.getSubject(), request.getProductId(), request.getQuantity());
         return CartResponseDto.fromCart(cart);
     }
@@ -33,7 +36,7 @@ public class CartController {
     @PatchMapping("/items/{productId}")
     public CartResponseDto updateQuantity(@AuthenticationPrincipal Jwt jwt,
                                           @PathVariable String productId,
-                                          @RequestBody UpdateQuantityRequestDto request) {
+                                          @Valid @RequestBody UpdateQuantityRequestDto request) {
         Cart cart = cartService.updateItemQuantity(jwt.getSubject(), productId, request.getQuantity());
         return CartResponseDto.fromCart(cart);
     }
