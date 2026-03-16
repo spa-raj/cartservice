@@ -4,7 +4,6 @@ import com.vibevault.cartservice.dtos.cart.ProductDto;
 import com.vibevault.cartservice.exceptions.ProductNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;

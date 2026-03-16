@@ -45,6 +45,15 @@ public class ExceptionAdvices {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI(), "EMPTY_CART");
     }
 
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionDto> handleValidation(org.springframework.web.bind.MethodArgumentNotValidException ex, HttpServletRequest request) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .reduce((a, b) -> a + "; " + b)
+                .orElse("Validation failed");
+        return buildResponse(HttpStatus.BAD_REQUEST, message, request.getRequestURI(), "VALIDATION_ERROR");
+    }
+
     @ExceptionHandler(org.springframework.dao.OptimisticLockingFailureException.class)
     public ResponseEntity<ExceptionDto> handleOptimisticLock(Exception ex, HttpServletRequest request) {
         return buildResponse(HttpStatus.CONFLICT, "Cart was modified concurrently, please retry", request.getRequestURI(), "CONCURRENT_MODIFICATION");
