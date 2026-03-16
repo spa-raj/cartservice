@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -15,6 +16,6 @@ public class CartItem {
     private String productId;
     private String productName;
     private int quantity;
-    private double price;
+    private BigDecimal price;
     private LocalDateTime addedAt;
 }

@@ -10,8 +10,10 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Document(collection = "carts")
@@ -35,14 +37,18 @@ public class Cart {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public double getTotalPrice() {
-        return items.stream()
-                .mapToDouble(item -> item.getPrice() * item.getQuantity())
-                .sum();
+    public List<CartItem> getItems() {
+        return items != null ? items : Collections.emptyList();
+    }
+
+    public BigDecimal getTotalPrice() {
+        return getItems().stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public int getTotalItems() {
-        return items.stream()
+        return getItems().stream()
                 .mapToInt(CartItem::getQuantity)
                 .sum();
     }
