@@ -3,6 +3,7 @@ package com.vibevault.cartservice.services;
 import com.vibevault.cartservice.dtos.cart.ProductDto;
 import com.vibevault.cartservice.exceptions.CartItemNotFoundException;
 import com.vibevault.cartservice.exceptions.CartNotFoundException;
+import com.vibevault.cartservice.exceptions.EmptyCartException;
 import com.vibevault.cartservice.exceptions.InvalidQuantityException;
 import com.vibevault.cartservice.models.Cart;
 import com.vibevault.cartservice.models.CartItem;
@@ -111,7 +112,7 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new CartNotFoundException("Cart not found for user: " + userId));
 
         if (cart.getItems().isEmpty()) {
-            throw new CartNotFoundException("Cart is empty, cannot checkout");
+            throw new EmptyCartException("Cart is empty, cannot checkout");
         }
 
         log.info("Checkout initiated for user: {} with {} items", userId, cart.getTotalItems());

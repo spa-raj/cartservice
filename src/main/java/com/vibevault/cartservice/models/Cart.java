@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Document(collection = "carts")
@@ -38,7 +37,10 @@ public class Cart {
     private LocalDateTime updatedAt;
 
     public List<CartItem> getItems() {
-        return items != null ? items : Collections.emptyList();
+        if (items == null) {
+            items = new ArrayList<>();
+        }
+        return items;
     }
 
     public BigDecimal getTotalPrice() {
