@@ -37,19 +37,20 @@ public class CartServiceImpl implements CartService {
         }
 
         ProductDto product = productValidationService.getProduct(productId);
+        String resolvedProductId = product.getId();
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElse(Cart.builder().userId(userId).items(new ArrayList<>()).build());
 
         Optional<CartItem> existingItem = cart.getItems().stream()
-                .filter(item -> item.getProductId().equals(productId))
+                .filter(item -> item.getProductId().equals(resolvedProductId))
                 .findFirst();
 
         if (existingItem.isPresent()) {
             existingItem.get().setQuantity(existingItem.get().getQuantity() + quantity);
         } else {
             CartItem newItem = CartItem.builder()
-                    .productId(product.getId())
+                    .productId(resolvedProductId)
                     .productName(product.getName())
                     .quantity(quantity)
                     .price(product.getPrice().getPrice())
