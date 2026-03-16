@@ -45,6 +45,11 @@ public class ExceptionAdvices {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI(), "EMPTY_CART");
     }
 
+    @ExceptionHandler(org.springframework.dao.OptimisticLockingFailureException.class)
+    public ResponseEntity<ExceptionDto> handleOptimisticLock(Exception ex, HttpServletRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, "Cart was modified concurrently, please retry", request.getRequestURI(), "CONCURRENT_MODIFICATION");
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionDto> handleGenericException(Exception ex, HttpServletRequest request) {
         log.error("Unhandled exception at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
