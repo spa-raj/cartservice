@@ -76,33 +76,14 @@ jobs:
       - name: Configure kubectl
         run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
-      - name: Get infrastructure endpoints
-        id: params
-        run: |
-          MSK_CLUSTER_ARN=$(aws kafka list-clusters-v2 \
-            --query "ClusterInfoList[?ClusterName=='vibevault-dev'].ClusterArn | [0]" --output text 2>/dev/null || echo "")
-          if [ -n "$MSK_CLUSTER_ARN" ] && [ "$MSK_CLUSTER_ARN" != "None" ]; then
-            MSK_BOOTSTRAP=$(aws kafka get-bootstrap-brokers \
-              --cluster-arn "$MSK_CLUSTER_ARN" \
-              --query 'BootstrapBrokerString' --output text)
-            echo "kafka_bootstrap=${MSK_BOOTSTRAP}" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::MSK cluster not found — Kafka bootstrap servers not set"
-            echo "kafka_bootstrap=" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Deploy with Helm
         run: |
-          HELM_ARGS="helm upgrade --install ${{ env.HELM_RELEASE }} ${{ env.HELM_CHART_PATH }} \
+          helm upgrade --install ${{ env.HELM_RELEASE }} ${{ env.HELM_CHART_PATH }} \
             -n vibevault --create-namespace \
             --set image.repository=${{ needs.build-and-push.outputs.image_repo }} \
-            --set image.tag=${{ needs.build-and-push.outputs.image_tag }}"
-
-          if [ -n "${{ steps.params.outputs.kafka_bootstrap }}" ]; then
-            HELM_ARGS="$HELM_ARGS --set config.kafkaBootstrapServers=${{ steps.params.outputs.kafka_bootstrap }}"
-          fi
-
-          eval "$HELM_ARGS --wait --timeout 300s"
+            --set image.tag=${{ needs.build-and-push.outputs.image_tag }} \
+            --set config.kafkaBootstrapServers="kafka:9092" \
+            --wait --timeout 300s
 
       - name: Verify deployment
         run: kubectl rollout status deployment/${{ env.HELM_RELEASE }} -n vibevault --timeout=180s
