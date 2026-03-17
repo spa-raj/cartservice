@@ -643,10 +643,12 @@ fi
 TIMESTAMP2=$(date +%s)
 USER_A_EMAIL="cart-user-a-${TIMESTAMP2}@test.com"
 USER_B_EMAIL="cart-user-b-${TIMESTAMP2}@test.com"
+PHONE_A="90${TIMESTAMP2: -8}"
+PHONE_B="91${TIMESTAMP2: -8}"
 USER_PASSWORD="Test@1234"
 
 request POST "$USERSERVICE/auth/signup" "Content-Type: application/json" \
-    "{\"email\":\"${USER_A_EMAIL}\",\"password\":\"${USER_PASSWORD}\",\"name\":\"User A\",\"phone\":\"9000000001\",\"role\":\"CUSTOMER\"}"
+    "{\"email\":\"${USER_A_EMAIL}\",\"password\":\"${USER_PASSWORD}\",\"name\":\"User A\",\"phone\":\"${PHONE_A}\",\"role\":\"CUSTOMER\"}"
 if [ "$STATUS" = "201" ] || [ "$STATUS" = "409" ] || [ "$STATUS" = "400" ]; then
     echo -e "  ${GREEN}OK${NC} User A created (${USER_A_EMAIL})"
 else
@@ -655,7 +657,7 @@ else
 fi
 
 request POST "$USERSERVICE/auth/signup" "Content-Type: application/json" \
-    "{\"email\":\"${USER_B_EMAIL}\",\"password\":\"${USER_PASSWORD}\",\"name\":\"User B\",\"phone\":\"9000000002\",\"role\":\"CUSTOMER\"}"
+    "{\"email\":\"${USER_B_EMAIL}\",\"password\":\"${USER_PASSWORD}\",\"name\":\"User B\",\"phone\":\"${PHONE_B}\",\"role\":\"CUSTOMER\"}"
 if [ "$STATUS" = "201" ] || [ "$STATUS" = "409" ] || [ "$STATUS" = "400" ]; then
     echo -e "  ${GREEN}OK${NC} User B created (${USER_B_EMAIL})"
 else
