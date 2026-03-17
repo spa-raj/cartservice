@@ -16,6 +16,21 @@ services:
     networks:
       - cartservice-network
 
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: cartservice-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - cartservice-network
+
   # Kafka (KRaft mode — no Zookeeper)
   kafka:
     image: confluentinc/cp-kafka:7.8.7
@@ -55,6 +70,7 @@ services:
       PORT: 8082
       MONGODB_URI: mongodb://mongodb:27017/cartservice
       ISSUER_URI: ${ISSUER_URI:-http://userservice:8081}
+      REDIS_HOST: redis
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       PRODUCT_SERVICE_URL: http://productservice:8080
       JAVA_OPTS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
@@ -62,6 +78,8 @@ services:
       - "8082:8082"
     depends_on:
       mongodb:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       kafka:
         condition: service_healthy
