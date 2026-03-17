@@ -27,7 +27,7 @@ RUN apk add --no-cache wget
 RUN addgroup -S spring && adduser -S spring -G spring
 
 # Copy JAR from builder
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=builder /app/target/cartservice-0.0.1-SNAPSHOT.jar app.jar
 
 # Change ownership to spring user
 RUN chown spring:spring app.jar
