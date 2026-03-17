@@ -126,9 +126,32 @@ curl -s -X POST "$CARTSERVICE/cart/items" \
     -d "{\"productId\":\"${PROD3_ID}\",\"quantity\":1}" > /dev/null
 echo -e "  ${GREEN}Added:${NC} Leather Wallet x1"
 
-# Show cart via API
+# Show cart via API (this triggers Redis cache population)
 echo -e "\n${CYAN}=== Cart API Response ===${NC}"
 curl -s "$CARTSERVICE/cart" -H "Authorization: Bearer $TOKEN" | python3 -m json.tool
+
+# Show Redis cached keys and values
+REDIS_CONTAINER="cartservice-redis"
+echo -e "\n${CYAN}=== Redis Cached Cart ===${NC}"
+echo -e "  ${GREEN}Keys:${NC}"
+docker exec "$REDIS_CONTAINER" redis-cli KEYS "cart:*"
+echo ""
+echo -e "  ${GREEN}Cached value for admin:${NC}"
+docker exec "$REDIS_CONTAINER" redis-cli GET "cart:admin@gmail.com" | python3 -c "
+import sys, json
+raw = sys.stdin.read().strip()
+if raw and raw != '(nil)':
+    try:
+        data = json.loads(raw)
+        print(json.dumps(data, indent=2))
+    except:
+        print(raw[:500])
+else:
+    print('(no cached value)')
+" 2>/dev/null
+echo ""
+echo -e "  ${GREEN}TTL remaining:${NC}"
+docker exec "$REDIS_CONTAINER" redis-cli TTL "cart:admin@gmail.com"
 
 # Show MongoDB document
 echo -e "\n${CYAN}=== MongoDB Cart Document ===${NC}"
