@@ -76,6 +76,15 @@ jobs:
       - name: Configure kubectl
         run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
 
+      - name: Sync MongoDB credentials to AWS Secrets Manager
+        run: |
+          aws secretsmanager put-secret-value \
+            --secret-id "vibevault/dev/cartservice/mongo-credentials" \
+            --secret-string "{\"connectionString\":\"${{ secrets.MONGODB_URI }}\"}" 2>/dev/null \
+          || aws secretsmanager create-secret \
+            --name "vibevault/dev/cartservice/mongo-credentials" \
+            --secret-string "{\"connectionString\":\"${{ secrets.MONGODB_URI }}\"}"
+
       - name: Deploy with Helm
         run: |
           helm upgrade --install ${{ env.HELM_RELEASE }} ${{ env.HELM_CHART_PATH }} \
