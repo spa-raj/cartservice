@@ -1,5 +1,6 @@
 package com.vibevault.cartservice.configurations;
 
+import com.vibevault.cartservice.models.Cart;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -16,8 +17,8 @@ public class RedisConfig {
     public static final Duration CART_CACHE_TTL = Duration.ofMinutes(30);
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, Cart> cartRedisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Cart> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJacksonJsonRedisSerializer(new ObjectMapper()));
