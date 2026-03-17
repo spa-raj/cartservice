@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cartservice.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cartservice.labels" . | nindent 4 }}
+data:
+  PORT: "{{ .Values.containerPort }}"
+  ISSUER_URI: {{ .Values.config.issuerUri | quote }}
+  PRODUCT_SERVICE_URL: {{ .Values.config.productServiceUrl | quote }}
+  {{- if .Values.config.kafkaBootstrapServers }}
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.config.kafkaBootstrapServers | quote }}
+  {{- end }}
