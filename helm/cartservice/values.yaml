@@ -1,0 +1,34 @@
+replicaCount: 2
+
+image:
+  repository: cartservice
+  tag: latest
+  pullPolicy: Always
+
+containerPort: 8082
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: 500m
+    memory: 768Mi
+
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
+config:
+  issuerUri: "http://userservice:8081"
+  productServiceUrl: "http://productservice:80"
+  kafkaBootstrapServers: ""
+
+externalSecrets:
+  mongoSecretName: "vibevault/dev/cartservice/mongo-credentials"
