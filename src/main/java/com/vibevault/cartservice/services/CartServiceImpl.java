@@ -24,11 +24,24 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductValidationService productValidationService;
     private final CartEventProducer cartEventProducer;
+    private final CartCacheService cartCacheService;
 
     @Override
     public Cart getCart(String userId) {
-        return cartRepository.findByUserId(userId)
+        // Cache-aside: check Redis first
+        Cart cached = cartCacheService.get(userId);
+        if (cached != null) {
+            return cached;
+        }
+
+        Cart cart = cartRepository.findByUserId(userId)
                 .orElse(Cart.builder().userId(userId).items(new ArrayList<>()).build());
+
+        // Only cache if cart exists in MongoDB (has an ID)
+        if (cart.getId() != null) {
+            cartCacheService.put(userId, cart);
+        }
+        return cart;
     }
 
     @Override
@@ -62,6 +75,7 @@ public class CartServiceImpl implements CartService {
         }
 
         Cart saved = cartRepository.save(cart);
+        cartCacheService.evict(userId);
         cartEventProducer.sendItemAdded(userId, resolvedProductId, quantity);
         return saved;
     }
@@ -86,6 +100,7 @@ public class CartServiceImpl implements CartService {
 
         item.setQuantity(quantity);
         Cart saved = cartRepository.save(cart);
+        cartCacheService.evict(userId);
         cartEventProducer.sendItemUpdated(userId, productId, quantity);
         return saved;
     }
@@ -101,6 +116,7 @@ public class CartServiceImpl implements CartService {
         }
 
         Cart saved = cartRepository.save(cart);
+        cartCacheService.evict(userId);
         cartEventProducer.sendItemRemoved(userId, productId);
         return saved;
     }
@@ -112,6 +128,7 @@ public class CartServiceImpl implements CartService {
 
         cart.getItems().clear();
         Cart saved = cartRepository.save(cart);
+        cartCacheService.evict(userId);
         cartEventProducer.sendCartCleared(userId);
         return saved;
     }
