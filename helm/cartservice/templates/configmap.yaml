@@ -12,3 +12,4 @@ data:
   {{- if .Values.config.kafkaBootstrapServers }}
   KAFKA_BOOTSTRAP_SERVERS: {{ .Values.config.kafkaBootstrapServers | quote }}
   {{- end }}
+  REDIS_HEALTH_ENABLED: "false"

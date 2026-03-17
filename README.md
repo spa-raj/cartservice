@@ -73,12 +73,14 @@ Cart service runs on port **8082**.
 ## Architecture
 
 ```
-Client → Cart Service → MongoDB (cart storage)
-                     → Redis (cart cache, 30min TTL)
-                     → Kafka (cart events)
+Client → Cart Service → MongoDB Atlas (cart storage)
+                     → Redis (cart cache, local dev only — graceful degradation without it)
+                     → Kafka (cart events, KRaft)
                      → Product Service (product validation via RestClient)
                      ← User Service (JWT validation via OAuth2)
 ```
+
+> Redis is available in local Docker dev. On EKS, Redis is not deployed — the cache layer degrades gracefully and all reads go directly to MongoDB. Benchmark showed MongoDB (6.2ms) outperforms Redis (8.21ms) with co-located containers.
 
 ## Key Design Decisions
 
