@@ -247,6 +247,10 @@ fi
 section "3. Setup: Create test product in productservice"
 # --------------------------------------------------
 
+# Clear any leftover cart from previous test runs
+curl -s -X DELETE "$CARTSERVICE/cart" -H "Authorization: Bearer $TOKEN" > /dev/null 2>&1
+echo -e "  ${GREEN}OK${NC} Admin cart cleared (clean slate)"
+
 TIMESTAMP=$(date +%s)
 PRODUCT_NAME="CartTest-Product-${TIMESTAMP}"
 
