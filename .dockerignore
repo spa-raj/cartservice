@@ -7,12 +7,8 @@
 *.iml
 .vscode
 
-# Build artifacts (except what we need)
+# Build artifacts (built inside container, host artifacts not needed)
 target/
-!target/*.jar
-
-# Maven wrapper jar (will be downloaded)
-.mvn/wrapper/maven-wrapper.jar
 
 # Documentation
 *.md
