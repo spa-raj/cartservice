@@ -4,12 +4,15 @@ import com.vibevault.cartservice.configurations.RedisConfig;
 import com.vibevault.cartservice.models.Cart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConditionalOnBean(RedisConnectionFactory.class)
 public class CartCacheServiceRedisImpl implements CartCacheService{
 
     private static final String CACHE_PREFIX = "cart:";
