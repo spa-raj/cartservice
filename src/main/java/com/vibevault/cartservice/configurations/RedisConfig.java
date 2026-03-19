@@ -9,12 +9,9 @@ import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializ
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import tools.jackson.databind.ObjectMapper;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-
 import java.time.Duration;
 
 @Configuration
-@ConditionalOnBean(RedisConnectionFactory.class)
 public class RedisConfig {
 
     public static final Duration CART_CACHE_TTL = Duration.ofMinutes(30);

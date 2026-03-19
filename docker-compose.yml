@@ -16,6 +16,20 @@ services:
     networks:
       - cartservice-network
 
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: cartservice-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - cartservice-network
 
   # Kafka (KRaft mode — no Zookeeper)
   kafka:
@@ -27,7 +41,7 @@ services:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_LISTENERS: PLAINTEXT://kafka:29092,CONTROLLER://kafka:9093,PLAINTEXT_HOST://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
@@ -44,10 +58,7 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      cartservice-network:
-      vibevault-network:
-        aliases:
-          - kafka
+      - cartservice-network
 
   # Cart Service Application
   cartservice:
@@ -59,15 +70,16 @@ services:
       PORT: 8082
       MONGODB_URI: mongodb://mongodb:27017/cartservice
       ISSUER_URI: ${ISSUER_URI:-http://userservice:8081}
+      REDIS_HOST: redis
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       PRODUCT_SERVICE_URL: http://productservice:8080
-      REDIS_HEALTH_ENABLED: "false"
-      SPRING_AUTOCONFIGURE_EXCLUDE: org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,org.springframework.boot.data.redis.autoconfigure.DataRedisRepositoriesAutoConfiguration
       JAVA_OPTS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
     ports:
       - "8082:8082"
     depends_on:
       mongodb:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       kafka:
         condition: service_healthy
