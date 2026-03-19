@@ -13,4 +13,3 @@ data:
   KAFKA_BOOTSTRAP_SERVERS: {{ .Values.config.kafkaBootstrapServers | quote }}
   {{- end }}
   REDIS_HEALTH_ENABLED: "false"
-  SPRING_AUTOCONFIGURE_EXCLUDE: "org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration,org.springframework.boot.data.redis.autoconfigure.DataRedisRepositoriesAutoConfiguration"
