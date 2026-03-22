@@ -43,6 +43,19 @@ Cache-aside pattern for cart reads:
 - **Write:** MongoDB update → evict Redis cache.
 - **TTL:** 30 minutes. Graceful degradation — service works without Redis.
 
+## Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `8082` | Server port |
+| `MONGODB_URI` | `mongodb://localhost:27017/cartservice` | MongoDB connection string |
+| `ISSUER_URI` | `http://localhost:8081` | OAuth2 issuer for JWT validation |
+| `KAFKA_BOOTSTRAP_SERVERS` | `localhost:9092` | Kafka broker address |
+| `PRODUCT_SERVICE_URL` | `http://localhost:8080` | ProductService URL for cart item validation |
+| `REDIS_HOST` | `localhost` | Redis host (disabled in docker-compose and EKS) |
+| `REDIS_PORT` | `6379` | Redis port |
+| `REDIS_HEALTH_ENABLED` | `true` | Set to `false` when Redis is not deployed |
+
 ## Local Development
 
 ### Prerequisites
@@ -54,7 +67,7 @@ Cache-aside pattern for cart reads:
 ### Run
 ```bash
 docker network create vibevault-network 2>/dev/null; true
-docker compose up -d    # MongoDB + Redis + Kafka + cartservice
+docker compose up -d    # MongoDB + Kafka + cartservice (Redis disabled)
 ```
 
 Cart service runs on port **8082**.
